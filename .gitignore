@@ -219,7 +219,5 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-data/
-output/
 *.gpx
 *.fit
