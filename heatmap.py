@@ -7,6 +7,11 @@ import gpxpy.gpx
 import csv
 import plotly
 import plotly.express as px
+from tkinter import *
+from tkinter import ttk
+
+from createCSV import createWholeCSV as CCSV
+
 
 def createHeatmap(name):
     df = pd.read_csv(f"data/csvs/{name}.csv")
@@ -17,50 +22,29 @@ def createHeatmap(name):
 
 
 
-
-def createDataFile(dir):
-    gpx_file = open(dir, "r")
-    gpx = gpxpy.parse(gpx_file)
-    name = str(dir).removeprefix("data\\gpxs\\")
-    name = name.removesuffix(".gpx")
-
-    points = []
-    with open(f"data/csvs/{name}.csv", "w", newline="", encoding="utf-8") as csvactivity:
-        csvwriter = csv.writer(csvactivity)
-        csvwriter.writerow(["index", "latitude", "longitude", "elevation"])
-        for track in gpx.tracks:
-
-            for seg in track.segments:
-
-                i = 0
-                for point in seg.points:
-
-                    if i % 1 == 0:
-
-                        print(f"Point at ({point.longitude}, {point.latitude}) at elevation {point.elevation}")
-                        csvwriter.writerow([i, point.latitude, point.longitude, point.elevation])
-                    i += 1
-    return name
-
-
+root = Tk()
 
 
 def main():
+    frm = ttk.Frame(root, padding=10)
+    frm.grid()
+    ttk.Label(frm, text="Garmin Heatmap").grid(column=0, row=0)
     
+
     directory = Path("data/gpxs")
 
 
-    files = [f for f in directory.iterdir() if f.is_file()]
+    folders = [folder for folder in directory.iterdir() if folder.is_dir()]
     
-    for i in range(len(files)):
-        
-        print(i, files[i])
-    selected = int(input("which file would you like the data for: "))
-    createHeatmap(createDataFile(files[selected]))
+    for i in range(len(folders)):
+        ttk.Button(frm, text=f"Create {folders[i].name}'s heatmap", command=createHeatmap(CCSV(folders[i]))).grid(column=i, row=1)
+
+    #NPTHING ELSE BELOW THIS IN MAIN
+    Tk.mainloop(self=frm)
 
 
-    
 
 
 if __name__ == "__main__":
     main()
+    
