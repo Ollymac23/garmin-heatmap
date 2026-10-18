@@ -7,44 +7,55 @@ import gpxpy.gpx
 import csv
 import plotly
 import plotly.express as px
-from tkinter import *
-from tkinter import ttk
+from nicegui import ui
 
 from createCSV import createWholeCSV as CCSV
 
 
-def createHeatmap(name):
+
+
+def CreateHeatmap(name):
+
     df = pd.read_csv(f"data/csvs/{name}.csv")
 
     fig = px.density_map(df, lat="latitude", lon="longitude", radius=4, center=dict(lat=52, lon=1), zoom=5, map_style="open-street-map")
-    fig.show()
+    return fig
+
+
+def ShowHeatmap(name: str):
+    fig = CreateHeatmap(name)
+    plot_area.clear()
+    with plot_area:
+        ui.plotly(fig).classes("w-full h-[600px]")
+
+
+ui.query("body").style("font-family: Helvetica, Arial, sans-serif")
+
+ui.label("Garmin Heatmaps").classes("text-3x1 font-bold")
+
+
+directory = Path("data/gpxs")
+
+
+folders = [folder for folder in directory.iterdir() if folder.is_dir()]
+
+with ui.row().classes("w-full no-wrap"):
+    with ui.column().classes("gap-2"):
+        for folder in folders:
+            ui.button(
+                f"Create {folder.name}'s heatmap",
+                on_click=lambda name=folder.name:ShowHeatmap(name),
+                
+            ).classes("w-64").style(
+                "background-color: #AECE64 !important; "
+                "color: #031B26 !important; border-radius: 12px; font-family:Helvetica;"
+            )
+
+    plot_area = ui.column().classes("flex-grow")
+
     
 
 
-
-root = Tk()
-
-
-def main():
-    frm = ttk.Frame(root, padding=10)
-    frm.grid()
-    ttk.Label(frm, text="Garmin Heatmap").grid(column=0, row=0)
-    
-
-    directory = Path("data/gpxs")
-
-
-    folders = [folder for folder in directory.iterdir() if folder.is_dir()]
-    
-    for i in range(len(folders)):
-        ttk.Button(frm, text=f"Create {folders[i].name}'s heatmap", command=createHeatmap(CCSV(folders[i]))).grid(column=i, row=1)
-
-    #NPTHING ELSE BELOW THIS IN MAIN
-    Tk.mainloop(self=frm)
-
-
-
-
-if __name__ == "__main__":
-    main()
+if __name__ in {"__main__", "__mp_main__"}:
+    ui.run(title="Garmin Heatmap")
     
