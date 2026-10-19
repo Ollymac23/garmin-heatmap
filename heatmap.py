@@ -58,5 +58,5 @@ with ui.row().classes("w-full no-wrap"):
 
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(title="Garmin Heatmap", host="0.0.0.0", port=int(os.eviron.get("PORT", 8080)), reload=False, show=False)
+    ui.run(title="Garmin Heatmap", host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), reload=False, show=False)
     
