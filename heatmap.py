@@ -32,7 +32,8 @@ def ShowHeatmap(name: str):
 
 ui.query("body").style("font-family: Helvetica, Arial, sans-serif")
 
-ui.label("Garmin Heatmaps").classes("text-3x1 font-bold")
+with ui.row().style("display: flex; justify-content: center; width: 100%;"):
+    ui.label("Garmin Heatmaps").style("color: #031B26; font-size: 40px; font-family: Arial, Helvetica, sans-serif; weight: bold;")
 
 
 directory = Path("data/gpxs")
@@ -40,8 +41,8 @@ directory = Path("data/gpxs")
 
 folders = [folder for folder in directory.iterdir() if folder.is_dir()]
 
-with ui.row().classes("w-full no-wrap"):
-    with ui.column().classes("gap-2"):
+with ui.column().style("width: 100%;"):
+    with ui.row().classes("gap-2"):
         for folder in folders:
             ui.button(
                 f"Create {folder.name}'s heatmap",
@@ -52,7 +53,7 @@ with ui.row().classes("w-full no-wrap"):
                 "color: #031B26 !important; border-radius: 12px; font-family:Helvetica;"
             )
 
-    plot_area = ui.column().classes("flex-grow")
+    plot_area = ui.row().classes("flex-grow")
 
     
 
