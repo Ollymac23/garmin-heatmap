@@ -14,8 +14,11 @@ from createCSV import createWholeCSV as CCSV
 
 
 
-
 def CreateHeatmap(name):
+
+    CCSV(name)
+
+    
 
     df = pd.read_csv(f"data/csvs/{name}.csv")
 
@@ -28,12 +31,13 @@ def ShowHeatmap(name: str):
     plot_area.clear()
     with plot_area:
         ui.plotly(fig).classes("w-full h-[600px]")
+        ui.label("Look around the map to see where you've been the most!").style("font-family: Impact, fantasy; font-size: 30px; color: #EBF9DC;")
 
 
-ui.query("body").style("font-family: Helvetica, Arial, sans-serif")
+ui.query("body").style("font-family: Helvetica, Arial, sans-serif; background-color: #333747")
 
-with ui.row().style("display: flex; justify-content: center; width: 100%;"):
-    ui.label("Garmin Heatmaps").style("color: #031B26; font-size: 40px; font-family: Arial, Helvetica, sans-serif; weight: bold;")
+with ui.row().style("display: flex; justify-content: center; width: 100%; background-color: #EBF9DC"):
+    ui.label("Garmin Heatmaps").style("color: #011410; font-size: 40px; font-family: Impact, fantasy; weight: bold;")
 
 
 directory = Path("data/gpxs")
@@ -42,18 +46,31 @@ directory = Path("data/gpxs")
 folders = [folder for folder in directory.iterdir() if folder.is_dir()]
 
 with ui.column().style("width: 100%;"):
-    with ui.row().classes("gap-2"):
+    with ui.row().classes("gap-2").style("width: 100%; justify-content: center;"):
         for folder in folders:
-            ui.button(
-                f"Create {folder.name}'s heatmap",
-                on_click=lambda name=folder.name:ShowHeatmap(name),
-                
-            ).classes("w-64").style(
-                "background-color: #AECE64 !important; "
-                "color: #031B26 !important; border-radius: 12px; font-family:Helvetica;"
-            )
+            with ui.column().style("justify-content: center;"):
+                ui.button(
+                    f"Create {folder.name}'s heatmap",
+                    on_click=lambda name=folder.name:ShowHeatmap(CCSV(name)),
+                    
+                ).style(
+                    "background-color: #C62F4F !important; "
+                    "color: #FDEDEE !important; border-radius: 12px; font-family:Impact, fantasy; weight: bold; font-size: 20px;"
+                )
 
-    plot_area = ui.row().classes("flex-grow")
+
+                directory = Path(folder)
+                files = [file for file in directory.iterdir() if folder.is_dir()]
+
+
+                with ui.list().props("bordered seperator"):
+
+                    for file in files:
+
+                        ui.item(file.name).style("font-family: Impact, fantasy; background color: #454A5F !important; color: #EBF9DC;")
+
+    plot_area = ui.row().classes("flex-grow").style("justify-content: center;")
+
 
     
 
