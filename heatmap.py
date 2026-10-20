@@ -12,6 +12,14 @@ import os
 
 from createCSV import createWholeCSV as CCSV
 
+uploadDir = Path("data/gpxs/olly")
+
+async def UploadHandler(e):
+    filename = Path(e.file.name).name
+    target = uploadDir / filename
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(e.file.read())
+    ui.notify(f"Uploaded {e.name} successfully.")
 
 
 def CreateHeatmap(name):
@@ -58,16 +66,26 @@ with ui.column().style("width: 100%;"):
                     "color: #FDEDEE !important; border-radius: 12px; font-family:Impact, fantasy; weight: bold; font-size: 20px;"
                 )
 
+                ui.upload(
+                    label="Drop GPX files here",
+                    on_upload=UploadHandler,
+                    multiple=True,
+                    auto_upload=True,
+                    on_rejected=ui.notify("Upload failed.", type="negative")
+
+                ).props("accept=.gpx")
+
 
                 directory = Path(folder)
                 files = [file for file in directory.iterdir() if folder.is_dir()]
 
 
-                with ui.list().props("bordered seperator"):
+                with ui.list().props("dense").style("width: 100%; background-color: #454A5F !important; border-radius: 12px;"):
 
                     for file in files:
 
                         ui.item(file.name).style("font-family: Impact, fantasy; background color: #454A5F !important; color: #EBF9DC;")
+
 
     plot_area = ui.row().classes("flex-grow").style("justify-content: center;")
 
