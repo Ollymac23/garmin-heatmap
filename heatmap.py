@@ -12,14 +12,68 @@ import os
 
 from createCSV import createWholeCSV as CCSV
 
-uploadDir = Path("data/gpxs/olly")
+uploadDir = Path("data/gpxs")
+
+def FolderCheck():
+    folderName = str(personName.value or "").lower()
+    folderPath = Path(f"data/gpxs/{folderName}")
+    dataPath = Path("data/gpxs")
+    folders = [folder.name for folder in dataPath.iterdir() if folder.is_dir()]
+    if folderName in folders:
+        return folderName
+    elif folderName == "" or None:
+        return False
+    else:
+        os.makedirs(f"data/gpxs/{folderName}", exist_ok=True)
+        return folderName
+
+    
+
 
 async def UploadHandler(e):
+
+    folderName = FolderCheck()
+    if folderName == False:
+        ui.notify("Please enter a name", type="warning")
+        return
+    
     filename = Path(e.file.name).name
-    target = uploadDir / filename
+    target =  uploadDir / folderName / filename
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_bytes(e.file.read())
-    ui.notify(f"Uploaded {e.name} successfully.")
+    target.write_bytes(await e.file.read())
+    ui.notify(f"Uploaded {filename} successfully.", type="positive")
+    DrawFileList.refresh()
+
+
+@ui.refreshable
+def DrawFileList(folder):
+    with ui.list().props("dense seperator").style("width: 100%; background-color: #454A5F !important; border-radius: 12px;"):
+
+        dir = Path(folder)
+
+        files = [file for file in dir.iterdir() if file.is_file()]
+        for file in files:
+
+            ui.item(
+                file.name
+            ).style("font-family: Impact, fantasy; color: #FDEDEE !important; font-size: 15;")
+
+@ui.refreshable
+def DrawButtons(folder):
+    ui.button(
+        f"Create {folder.name}'s heatmap",
+        on_click=lambda name=folder.name:ShowHeatmap(CCSV(name)),
+                    
+    ).style(
+        "background-color: #C62F4F !important; "
+        "color: #FDEDEE !important; border-radius: 12px; font-family:Impact, fantasy; weight: bold; font-size: 20px;"
+    )
+
+
+
+
+    
+
 
 
 def CreateHeatmap(name):
@@ -57,34 +111,25 @@ with ui.column().style("width: 100%;"):
     with ui.row().classes("gap-2").style("width: 100%; justify-content: center;"):
         for folder in folders:
             with ui.column().style("justify-content: center;"):
-                ui.button(
-                    f"Create {folder.name}'s heatmap",
-                    on_click=lambda name=folder.name:ShowHeatmap(CCSV(name)),
-                    
-                ).style(
-                    "background-color: #C62F4F !important; "
-                    "color: #FDEDEE !important; border-radius: 12px; font-family:Impact, fantasy; weight: bold; font-size: 20px;"
-                )
+                DrawButtons(folder)
+                DrawFileList(folder)
+    with ui.row().style("width: 100%; justify-content: center;"):
+        with ui.column().style("align-content: center;"):
+            personName = ui.input("Enter name").props("outlined rounded dense").style("font-family: Impact, fantasy; color: #FDEDEE !important; font-size: 20px; width: 100%")
+            ui.upload(
+                label="Drop GPX files here",
+                on_upload=UploadHandler,
+                multiple=True,
+                auto_upload=True,
+                on_rejected=ui.notify("Upload failed.", type="negative")
 
-                ui.upload(
-                    label="Drop GPX files here",
-                    on_upload=UploadHandler,
-                    multiple=True,
-                    auto_upload=True,
-                    on_rejected=ui.notify("Upload failed.", type="negative")
-
-                ).props("accept=.gpx")
+            ).props("accept=.gpx")
 
 
-                directory = Path(folder)
-                files = [file for file in directory.iterdir() if folder.is_dir()]
 
 
-                with ui.list().props("dense").style("width: 100%; background-color: #454A5F !important; border-radius: 12px;"):
 
-                    for file in files:
 
-                        ui.item(file.name).style("font-family: Impact, fantasy; background color: #454A5F !important; color: #EBF9DC;")
 
 
     plot_area = ui.row().classes("flex-grow").style("justify-content: center;")
