@@ -98,6 +98,30 @@ def ShowHeatmap(name: str):
 
 ui.query("body").style("font-family: Helvetica, Arial, sans-serif; background-color: #333747")
 
+ui.add_css("""
+.name-input .q-field__control {
+    background-color: #C62F4F !important;
+    border-radius: 12px !important;
+
+}
+.name-input .q-field__control {
+    color: #FDEDEE !important;
+    font-family: Impact, fantasy;
+
+
+}
+
+.name-input .q-field--focused .q-field__control:after {
+    border-color: #fdedee !important;
+
+
+
+}
+
+
+""")
+
+
 with ui.row().style("display: flex; justify-content: center; width: 100%; background-color: #EBF9DC"):
     ui.label("Garmin Heatmaps").style("color: #011410; font-size: 40px; font-family: Impact, fantasy; weight: bold;")
 
@@ -115,7 +139,9 @@ with ui.column().style("width: 100%;"):
                 DrawFileList(folder)
     with ui.row().style("width: 100%; justify-content: center;"):
         with ui.column().style("align-content: center;"):
-            personName = ui.input("Enter name").props("outlined rounded dense").style("font-family: Impact, fantasy; color: #FDEDEE !important; font-size: 20px; width: 100%")
+            personName = ui.input("Enter your name").props(
+                "outlined rounded dense"
+                ).classes("name-input").style("width: 100%;")
             ui.upload(
                 label="Drop GPX files here",
                 on_upload=UploadHandler,
@@ -123,7 +149,7 @@ with ui.column().style("width: 100%;"):
                 auto_upload=True,
                 on_rejected=ui.notify("Upload failed.", type="negative")
 
-            ).props("accept=.gpx")
+            ).props("accept=.gpx").classes("name-input")
 
 
 
