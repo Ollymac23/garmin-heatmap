@@ -102,27 +102,52 @@ ui.add_css("""
 .name-input .q-field__control {
     background-color: #C62F4F !important;
     border-radius: 12px !important;
-
 }
+
 .name-input .q-field__control {
     color: #FDEDEE !important;
     font-family: Impact, fantasy;
-
-
 }
 
 .name-input .q-field--focused .q-field__control:after {
     border-color: #fdedee !important;
-
-
-
 }
+
+.gpx-upload {
+    background-color: #C62F4F !important;
+    border-radius: 12px !important;
+    border-color: #000000;
+}
+
+.gpx-upload .q-uploader__header {
+    background-color: #A60F2F !important;
+    border-radius: 12px 12px 0 0;
+    font-family: Impact, fantasy;
+    font-weight: light !important;
+}
+
+.gpx-upload .q-uploader__subtitle,
+.gpx-upload .q-uploader__title {
+    color: #fdedee !important;
+    font-weight: light !important;
+}
+
+.gpx-upload .q-uploader__list {
+    background-color: #C62F4F !important;
+    color: FDEDEE;
+    min-height: 80px;
+}
+
+.gpx-upload .q-uploader__file {
+    border-radius: 8px;
+}
+
 
 
 """)
 
 
-with ui.row().style("display: flex; justify-content: center; width: 100%; background-color: #EBF9DC"):
+with ui.row().style("display: flex; justify-content: center; width: 100%; background-color: #fdedee"):
     ui.label("Garmin Heatmaps").style("color: #011410; font-size: 40px; font-family: Impact, fantasy; weight: bold;")
 
 
@@ -149,7 +174,7 @@ with ui.column().style("width: 100%;"):
                 auto_upload=True,
                 on_rejected=ui.notify("Upload failed.", type="negative")
 
-            ).props("accept=.gpx").classes("name-input")
+            ).props("accept=.gpx").classes("gpx-upload")
 
 
 
