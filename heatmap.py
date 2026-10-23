@@ -44,6 +44,16 @@ async def UploadHandler(e):
     ui.notify(f"Uploaded {filename} successfully.", type="positive")
     DrawFileList.refresh()
 
+async def ConfirmDelete():
+    with ui.dialog() as dialog, ui.card():
+        ui.label("Are you sure you want to delete this folder and all its contents?")
+        with ui.row():
+            ui.button("Delete", on_click=lambda: dialog.submit(True)).style("background-color: red !important; color: #fdedee !important;")
+            ui.button("Cancel", on_click=lambda: dialog.submit(False)).style("background-color: green !important; color: #fdedee !important")
+    result = await dialog
+    return result
+            
+
 def DeleteFolder(folder):
 
 
@@ -65,7 +75,7 @@ def DrawFileList(folder):
 
 @ui.refreshable
 def DrawButtons(folder):
-    with ui.row().style("padding: 0px;"):
+    with ui.row():
         ui.button(
             f"Create {folder.name}'s heatmap",
             on_click=lambda name=folder.name:ShowHeatmap(CCSV(name)),
@@ -77,7 +87,7 @@ def DrawButtons(folder):
         ui.button(
             icon="delete",
             on_click=lambda name=folder.name:DeleteFolder(name),
-        ).style("padding: 10px; height: 100%; background-color: #A60F2F !important; color: #fdedee !important;")
+        ).style("background-color: #A60F2F !important; color: #fdedee !important; border-radius: 12px;")
 
 
 
@@ -169,7 +179,7 @@ folders = [folder for folder in directory.iterdir() if folder.is_dir()]
 with ui.column().style("width: 100%;"):
     with ui.row().classes("gap-2").style("width: 100%; justify-content: center;"):
         for folder in folders:
-            with ui.column().style("justify-content: center;"):
+            with ui.column().style("justify-content: center; padding: 15px;"):
                 DrawButtons(folder)
                 DrawFileList(folder)
     with ui.row().style("width: 100%; justify-content: center;"):
