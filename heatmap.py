@@ -44,6 +44,11 @@ async def UploadHandler(e):
     ui.notify(f"Uploaded {filename} successfully.", type="positive")
     DrawFileList.refresh()
 
+def DeleteFolder(folder):
+
+
+
+    pass
 
 @ui.refreshable
 def DrawFileList(folder):
@@ -60,14 +65,19 @@ def DrawFileList(folder):
 
 @ui.refreshable
 def DrawButtons(folder):
-    ui.button(
-        f"Create {folder.name}'s heatmap",
-        on_click=lambda name=folder.name:ShowHeatmap(CCSV(name)),
-                    
-    ).style(
-        "background-color: #C62F4F !important; "
-        "color: #FDEDEE !important; border-radius: 12px; font-family:Impact, fantasy; weight: bold; font-size: 20px;"
-    )
+    with ui.row().style("padding: 0px;"):
+        ui.button(
+            f"Create {folder.name}'s heatmap",
+            on_click=lambda name=folder.name:ShowHeatmap(CCSV(name)),
+                        
+        ).style(
+            "background-color: #C62F4F !important; "
+            "color: #FDEDEE !important; border-radius: 12px; font-family:Impact, fantasy; weight: bold; font-size: 20px;"
+        )
+        ui.button(
+            icon="delete",
+            on_click=lambda name=folder.name:DeleteFolder(name),
+        ).style("padding: 10px; height: 100%; background-color: #A60F2F !important; color: #fdedee !important;")
 
 
 
