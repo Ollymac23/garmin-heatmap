@@ -98,16 +98,34 @@ def DrawButtons(folder):
                         
         ).style(
             "background-color: #C62F4F !important; "
-            "color: #FDEDEE !important; border-radius: 12px; font-family:Impact, fantasy; weight: bold; font-size: 20px;"
+            "color: #FDEDEE !important; " \
+            "font-family:Impact, fantasy;" \
+            "weight: bold;" \
+            "font-size: 20px;"
+            "border-top-left-radius: 12px;" \
+            "border-bottom-left-radius: 12px;" \
+            "border-bottom-right-radius: 0px;" \
+            "border-top-right-radius: 0px;"
         )
         with ui.column().classes("gap-0"):
             ui.button(
                 icon="delete",
                 on_click=lambda name=folder.name:DeleteFolder(name),
-            ).style("background-color: #A60F2F !important; color: #fdedee !important; border-radius: 12px; font-size:10px;")
+            ).style("background-color: #A60F2F !important; "\
+                    "color: #fdedee !important;" \
+                    "border-radius: 12px;" \
+                    "font-size:10px;" \
+                    "border-top-left-radius: 0px;" \
+                    "border-bottom-left-radius: 0px;" \
+                    "border-bottom-right-radius: 0px;" \
+                    "border-top-right-radius: 12px;")
 
             ui.button("", icon="add", on_click=lambda name=folder.name:SetPersonName(name),
-                      ).style("background-color: #12A944 !important; color: #fdedee !important; border-radius:12px; font-size: 10px")
+                      ).style("background-color: #12A944 !important; color: #fdedee !important; font-size: 10px;"
+                      "border-top-left-radius: 0;"
+                      "border-bottom-left-radius: 0;"
+                      "border-top-right-radius: 0;"
+                      "border-bottom-right-radius: 12px;")
 
 
 @ui.refreshable
@@ -209,6 +227,8 @@ ui.add_css("""
 
 with ui.row().style("display: flex; justify-content: center; width: 100%;"):
     ui.label("Garmin Heatmaps").style("color: #fdedee; font-size: 40px; font-family: Impact, fantasy; weight: bold;")
+with ui.row().style("width: 100%; justify-content: center;"):
+    ui.label("Please be patient with the map loading. The web demo service is quite slow. Thank you!").style("font-family: Impact, fantasy; font-size: 15; color: #fdedee;")
 
 
 
