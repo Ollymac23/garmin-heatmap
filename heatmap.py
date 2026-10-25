@@ -9,6 +9,8 @@ import plotly
 import plotly.express as px
 from nicegui import ui
 import os
+import shutil
+import stat
 
 from createCSV import createWholeCSV as CCSV
 
@@ -27,8 +29,6 @@ def FolderCheck():
         os.makedirs(f"data/gpxs/{folderName}", exist_ok=True)
         return folderName
 
-    
-
 
 async def UploadHandler(e):
 
@@ -42,25 +42,34 @@ async def UploadHandler(e):
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(await e.file.read())
     ui.notify(f"Uploaded {filename} successfully.", type="positive")
-    DrawFileList.refresh()
+    DrawUI.refresh()
+    
 
 async def ConfirmDelete():
-    with ui.dialog() as dialog, ui.card():
-        ui.label("Are you sure you want to delete this folder and all its contents?")
-        with ui.row():
-            ui.button("Delete", on_click=lambda: dialog.submit(True)).style("background-color: red !important; color: #fdedee !important;")
-            ui.button("Cancel", on_click=lambda: dialog.submit(False)).style("background-color: green !important; color: #fdedee !important")
+    with ui.dialog() as dialog, ui.card().classes("items-center").style("background-color: #434757; justify-content: center;"):
+        ui.label("Are you sure you want to delete this folder and all its contents?").style("font-family: Impact, fantasy; color: #fdedee; font-size: 20px;")
+        with ui.row().style("align-content: center;"):
+            ui.button("Delete", on_click=lambda: dialog.submit(True)).style("background-color: red !important; color: #fdedee !important;font-family: Impact, fantasy;")
+            ui.button("Cancel", on_click=lambda: dialog.submit(False)).style("background-color: green !important; color: #fdedee !important; font-family: Impact, fantasy;")
     result = await dialog
     return result
-            
-
-def DeleteFolder(folder):
 
 
+async def DeleteFolder(name):
+    delete = await ConfirmDelete()
 
-    pass
+    directory = Path(f"data/gpxs/{name}")
+    csv = Path(f"data/csvs/{name}.csv")
 
-@ui.refreshable
+    if delete:
+        shutil.rmtree(directory, onexc=lambda func, path, _: (os.chmod(path, stat.S_IWRITE), func(path)))
+        csv.unlink(missing_ok=True)
+        ui.notify(f"Successfully deleted {name}.", type="positive")
+    else:
+        ui.notify("Deletion cancelled.", type="warning")
+    DrawUI.refresh() 
+
+
 def DrawFileList(folder):
     with ui.list().props("dense seperator").style("width: 100%; background-color: #454A5F !important; border-radius: 12px;"):
 
@@ -73,27 +82,48 @@ def DrawFileList(folder):
                 file.name
             ).style("font-family: Impact, fantasy; color: #FDEDEE !important; font-size: 15;")
 
-@ui.refreshable
+
+def SetPersonName(name):
+    personName.value = name
+    ui.notify(f"Drag and drop or select files for {name}'s folder.", type="info")
+
+
+
 def DrawButtons(folder):
-    with ui.row():
+
+    with ui.row().classes("gap-0"):
         ui.button(
             f"Create {folder.name}'s heatmap",
-            on_click=lambda name=folder.name:ShowHeatmap(CCSV(name)),
+            on_click=lambda name=folder.name:ShowHeatmap(name),
                         
         ).style(
             "background-color: #C62F4F !important; "
             "color: #FDEDEE !important; border-radius: 12px; font-family:Impact, fantasy; weight: bold; font-size: 20px;"
         )
-        ui.button(
-            icon="delete",
-            on_click=lambda name=folder.name:DeleteFolder(name),
-        ).style("background-color: #A60F2F !important; color: #fdedee !important; border-radius: 12px;")
+        with ui.column().classes("gap-0"):
+            ui.button(
+                icon="delete",
+                on_click=lambda name=folder.name:DeleteFolder(name),
+            ).style("background-color: #A60F2F !important; color: #fdedee !important; border-radius: 12px; font-size:10px;")
+
+            ui.button("", icon="add", on_click=lambda name=folder.name:SetPersonName(name),
+                      ).style("background-color: #12A944 !important; color: #fdedee !important; border-radius:12px; font-size: 10px")
 
 
+@ui.refreshable
+def DrawUI():
+
+    directory = Path("data/gpxs")
+
+    folders = [folder for folder in directory.iterdir() if folder.is_dir()]
+    with ui.row().classes("gap-2").style("width: 100%; justify-content: center;"):
+            for folder in folders:
+                with ui.column().style("justify-content: center; padding: 15px;"):
+                    DrawButtons(folder)
+                    DrawFileList(folder)
 
 
-    
-
+    pass
 
 
 def CreateHeatmap(name):
@@ -122,15 +152,24 @@ ui.add_css("""
 .name-input .q-field__control {
     background-color: #C62F4F !important;
     border-radius: 12px !important;
+    color: #fdedee;
 }
 
 .name-input .q-field__control {
     color: #FDEDEE !important;
     font-family: Impact, fantasy;
+    font-size: 25px !important;
 }
 
 .name-input .q-field--focused .q-field__control:after {
     border-color: #fdedee !important;
+    color: #fdedee !imortnant;
+}
+
+.name-input .q-field__native {
+    color: #fdedee !important;
+    padding-top: 15px !important;
+
 }
 
 .gpx-upload {
@@ -144,6 +183,7 @@ ui.add_css("""
     border-radius: 12px 12px 0 0;
     font-family: Impact, fantasy;
     font-weight: light !important;
+    font-size: 15px !important;
 }
 
 .gpx-upload .q-uploader__subtitle,
@@ -155,7 +195,7 @@ ui.add_css("""
 .gpx-upload .q-uploader__list {
     background-color: #C62F4F !important;
     color: FDEDEE;
-    min-height: 80px;
+    min-height: 40px;
 }
 
 .gpx-upload .q-uploader__file {
@@ -167,21 +207,18 @@ ui.add_css("""
 """)
 
 
-with ui.row().style("display: flex; justify-content: center; width: 100%; background-color: #fdedee"):
-    ui.label("Garmin Heatmaps").style("color: #011410; font-size: 40px; font-family: Impact, fantasy; weight: bold;")
+with ui.row().style("display: flex; justify-content: center; width: 100%;"):
+    ui.label("Garmin Heatmaps").style("color: #fdedee; font-size: 40px; font-family: Impact, fantasy; weight: bold;")
 
 
-directory = Path("data/gpxs")
 
 
-folders = [folder for folder in directory.iterdir() if folder.is_dir()]
+
 
 with ui.column().style("width: 100%;"):
-    with ui.row().classes("gap-2").style("width: 100%; justify-content: center;"):
-        for folder in folders:
-            with ui.column().style("justify-content: center; padding: 15px;"):
-                DrawButtons(folder)
-                DrawFileList(folder)
+
+    DrawUI()
+    
     with ui.row().style("width: 100%; justify-content: center;"):
         with ui.column().style("align-content: center;"):
             personName = ui.input("Enter your name").props(
@@ -192,7 +229,7 @@ with ui.column().style("width: 100%;"):
                 on_upload=UploadHandler,
                 multiple=True,
                 auto_upload=True,
-                on_rejected=ui.notify("Upload failed.", type="negative")
+                on_rejected=lambda: ui.notify("Upload failed.", type="negative")
 
             ).props("accept=.gpx").classes("gpx-upload")
 
@@ -210,5 +247,5 @@ with ui.column().style("width: 100%;"):
 
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(title="Garmin Heatmap", host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), reload=False, show=False)
+    ui.run(title="Garmin Heatmap", host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), reload=True, show=False)
     
