@@ -238,7 +238,7 @@ with ui.column().style("width: 100%;"):
     DrawUI()
     
     with ui.row().style("width: 100%; justify-content: center;"):
-        
+
         with ui.column().style("align-content: center;"):
             personName = ui.input("Enter your name").props(
                 "outlined rounded dense"
@@ -255,7 +255,6 @@ with ui.column().style("width: 100%;"):
     plot_area = ui.row().classes("flex-grow").style("justify-content: center;")
 
 
-    
 
 
 if __name__ in {"__main__", "__mp_main__"}:
