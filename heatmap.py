@@ -227,12 +227,10 @@ ui.add_css("""
 
 with ui.row().style("display: flex; justify-content: center; width: 100%;"):
     ui.label("Garmin Heatmaps").style("color: #fdedee; font-size: 40px; font-family: Impact, fantasy; weight: bold;")
+
+
 with ui.row().style("width: 100%; justify-content: center;"):
     ui.label("Please be patient with the map loading. The web demo service is quite slow. Thank you!").style("font-family: Impact, fantasy; font-size: 15; color: #fdedee;")
-
-
-
-
 
 
 with ui.column().style("width: 100%;"):
@@ -240,6 +238,7 @@ with ui.column().style("width: 100%;"):
     DrawUI()
     
     with ui.row().style("width: 100%; justify-content: center;"):
+        
         with ui.column().style("align-content: center;"):
             personName = ui.input("Enter your name").props(
                 "outlined rounded dense"
@@ -252,13 +251,6 @@ with ui.column().style("width: 100%;"):
                 on_rejected=lambda: ui.notify("Upload failed.", type="negative")
 
             ).props("accept=.gpx").classes("gpx-upload")
-
-
-
-
-
-
-
 
     plot_area = ui.row().classes("flex-grow").style("justify-content: center;")
 
